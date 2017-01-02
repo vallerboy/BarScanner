@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="pl.oskarpolak.barscanner2">
+
+
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="Bratek"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name="pl.oskarpolak.barscanner2.MainActivity">
+
+        </activity>
+        <activity android:name="pl.oskarpolak.barscanner2.LoginActivity" />
+        <activity android:name="pl.oskarpolak.barscanner2.SplashActivity">       <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter></activity>
+
+
+        <activity android:windowSoftInputMode="adjustPan" android:name="pl.oskarpolak.barscanner2.NewDocumentActivity"></activity>
+    </application>
+
+</manifest>

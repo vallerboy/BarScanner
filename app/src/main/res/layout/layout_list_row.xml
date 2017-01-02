@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:text="+"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonAdd1"
+        android:layout_marginStart="23dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="19dp" />
+
+    <Button
+        android:text="-"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonRemove1"
+        android:layout_marginEnd="26dp"
+        android:layout_alignBaseline="@+id/buttonAdd1"
+        android:layout_alignBottom="@+id/buttonAdd1"
+        android:layout_alignParentEnd="true" />
+
+    <EditText
+        android:text="0"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:windowSoftInputMode="adjustPan"
+        android:id="@+id/countText1"
+        android:inputType="number"
+        android:layout_alignTop="@+id/buttonRemove1"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/buttonAdd1"
+        android:layout_alignStart="@+id/buttonAdd1"
+        android:id="@+id/textDescription"
+        android:gravity="center"
+        android:layout_alignEnd="@+id/buttonRemove1"
+        android:text="Nazwa produktu" />
+
+    <TextView
+        android:text="Numer partii"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textDescription"
+        android:layout_marginTop="11dp"
+        android:id="@+id/textPartion"
+        android:gravity="center"
+        android:layout_alignStart="@+id/textDescription"
+        android:layout_alignEnd="@+id/textDescription" />
+
+    <TextView
+        android:text="Numer."
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:paddingLeft="5dp"
+        android:paddingTop="1dp"
+        android:textSize="20sp"
+        android:textColor="@color/red"
+        android:layout_alignParentStart="true"
+        android:id="@+id/numerID" />
+
+</RelativeLayout>

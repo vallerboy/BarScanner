@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TextView
+        android:text="Nazwa: "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="10dp"
+        android:textSize="25sp"
+        android:layout_marginTop="11dp"
+        android:id="@+id/testNameProduct" />
+
+    <TextView
+        android:text="Partia: "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/testNameProduct"
+        android:layout_alignStart="@+id/testNameProduct"
+        android:layout_marginTop="11dp"
+        android:textSize="25sp"
+        android:id="@+id/textPartia" />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:id="@+id/separator"
+        android:visibility="visible"
+        android:paddingTop="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_alignBottom="@+id/textPartia"
+        android:background="@color/black"/>
+
+</RelativeLayout>

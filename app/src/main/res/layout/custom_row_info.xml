@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:id="@+id/separator"
+        android:visibility="visible"
+        android:paddingTop="20dp"
+        android:layout_alignBottom="@+id/textDostawy"
+        android:background="@color/black"/>
+
+    <TextView
+        android:text="ilosc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:layout_marginLeft="10dp"
+        android:textColor="@color/red"
+        android:id="@+id/textViewNUMERID"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="Stan produktu: "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:id="@+id/textViewStan"
+        android:layout_below="@+id/textViewNUMERID"
+        android:layout_alignStart="@+id/textViewNUMERID" />
+
+    <TextView
+        android:text="Dostawy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textDostawy"
+        android:textSize="19sp"
+        android:layout_below="@+id/textViewStan"
+        android:layout_alignStart="@+id/textViewStan"
+        android:layout_marginTop="27dp" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textPartiaInfo"
+        android:textSize="25sp"
+        android:layout_below="@+id/textViewStan"
+        android:layout_alignStart="@+id/textViewStan" />
+
+</RelativeLayout>
