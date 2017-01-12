@@ -2,7 +2,9 @@ package pl.oskarpolak.barscanner2;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.jb.barcode.BarcodeManager;
@@ -13,6 +15,8 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -30,6 +34,7 @@ import java.util.Random;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnLongClick;
 import pl.oskarpolak.barscanner2.data.Document;
 import pl.oskarpolak.barscanner2.data.Product;
 import pl.oskarpolak.barscanner2.mysql.MysqlLocalConnector;
@@ -78,7 +83,7 @@ public class NewDocumentActivity extends Activity {
         managerBeep = new BeepManager(this, true, true);
         manager = BarcodeManager.getInstance();
         manager.Barcode_Open(this, dataReceived);
-        manager.setScanTime(2000);
+        manager.setScanTime(3000);
 
         mysql = MysqlLocalConnector.getInstance();
 
@@ -96,16 +101,16 @@ public class NewDocumentActivity extends Activity {
         chooseType();
 
         mHandler.post(runnable);
-       // tests();
+        tests();
     }
 
     private void tests() {
 
        final List<String> eans = new ArrayList<String>();
-        eans.add("5904232215896");
-//        eans.add("5904232156892");
-//        eans.add("5904232176623");
-//        eans.add("5904232206023");
+            eans.add("5904232217340");
+       //     eans.add("5907516715105");
+        //    eans.add("5905782119009");
+        //    eans.add("8414299533880");
 //        eans.add("5904232152818");
 //        eans.add("5904232166372");
 //        eans.add("5904232152863");
@@ -164,11 +169,14 @@ public class NewDocumentActivity extends Activity {
     }
 
     private void insertData() {
+        Random r = new Random();
+        int rand = r.nextInt(9999);
         String sql;
+        Log.e("debug", "Products size: " + products.size());
         if(isParagon) {
-           sql = "INSERT INTO `DokHandlowe` (`ID`, `Guid`, `Exported`, `Kategoria`, `Stan`, `Potwierdzenie`, `Definicja`, `Magazyn`, `TypPartii`, `KierunekMagazynu`, `SposobRozliczaniaNadrzednego`, `NumerSymbol`, `NumerNumer`, `NumerPelny`, `Seria`, `Data`, `Czas`, `DataOperacji`, `Kontrahent`, `Odbiorca`, `Osoba`, `SymbolKasy`, `ObcyDataOtrzymania`, `ObcyNumer`, `DostawaTermin`, `DostawaSposob`, `DostawaOdpowiedzialny`, `OsobaKontrahenta`, `LiczonaOd`, `Rabat`, `DefinicjaEwidencji`, `KorektaVAT`, `SumaNetto`, `SumaVAT`, `SumaBrutto`, `DataKursu`, `TabelaKursowa`, `KursWaluty`, `BruttoCyValue`, `BruttoCySymbol`, `Poprawiajacy`, `Pracownik`, `MiejsceSwiadczenia`, `WarunkiDostawy`, `RodzajTransportu`, `RodzajTransakcji`, `OkresIntrastat`, `Opis`, `MaxIdent`, `Korekta`, `SposobPrzenoszeniaZaliczki`, `Stamp`, `NumerPelnyZapisany`, `SeriaZapisana`, `CzestotliwoscRozliczania`, `TerminRozliczenia`, `TypTerminuRozliczenia`, `Flags`, `RozliczanieZbiorcze`, `CenaNaPodrzedny`, `RodzajPlatnosciKaucji`, `UmowaInfoCyklKrotnosc`, `UmowaInfoCyklInterwal`, `UmowaInfoCyklTyp`, `UmowaInfoCyklCzas`, `UmowaInfoCyklPozycjaDnia`, `UmowaInfoCyklRodzajTerminu`, `UmowaInfoCyklSposobNaDniWolne`, `UmowaInfoCyklOkresCyklu`, `UmowaInfoCyklTermin`, `UmowaInfoDataOkresuRozliczeniowego`, `UmowaInfoWgZuzycia`, `UmowaInfoDomyslnyPodrzedny`, `OdbiorcaMiejsceDostawy`, `PrecyzjaCenyWymuszaj`, `PrecyzjaCenyPrecyzja`, `TerminRozliczeniaKaucji`, `InwentaryzacjaInfoBlokowanieTowarow`, `Podpisany`, `ProdukcjaInfoIdentyfikatorElementuPowiazanego`, `ZmianaParametrowZasobuInfoZmianaParametrowZasobu`, `ZmianaParametrowZasobuInfoIloscValue`, `ZmianaParametrowZasobuInfoIloscSymbol`, `ZmianaParametrowZasobuInfoWartoscCyValue`, `ZmianaParametrowZasobuInfoWartoscCySymbol`, `UmowaInfoCyklTermin2`, `UmowaInfoCyklTermin3`, `UmowaInfoCyklTermin4`, `UmowaInfoCyklTermin5`, `UmowaInfoCyklPozycjaDniaZaawansowana`, `DostawaCyklKrotnosc`, `DostawaCyklInterwal`, `DostawaCyklTyp`, `DostawaCyklCzas`, `DostawaCyklPozycjaDnia`, `DostawaCyklRodzajTerminu`, `DostawaCyklSposobNaDniWolne`, `DostawaCyklOkresCyklu`, `DostawaCyklTermin`, `DostawaCyklTermin2`, `DostawaCyklTermin3`, `DostawaCyklTermin4`, `DostawaCyklTermin5`, `DostawaCyklPozycjaDniaZaawansowana`, `EDokumentStatus`, `BuforOpisuAnalitycznego`, `OkresFrom`, `OkresTo`, `EDokumentRodzaj`, `EDokumentStatusData`, `FiltrZasobow`, `KrajPodatkuVat`, `PodzialKosztuDodatkowego`, `CechaPodzialuKosztuDodatkowego`, `RealizacjaStan`, `RealizacjaWynik`) VALUES (NULL, '" + lastFactur.getLastGUID() + "', '0', '2', '0', '0', '6', '1', '0', '-1', '0', 'PAR/*/" + Utils.getLastTwoDigistsOfYear() + "', '"+ lastFactur.getLastFactureId() + "', 'PAR/"+ lastFactur.getFULLIDFVConformed() + "/"+Utils.getLastTwoDigistsOfYear() + "', '', '" + Utils.getData() + "', '907', '" + Utils.getData() + "', '1', '1', '', NULL, '" + Utils.getData() + "', '', '" + Utils.getData() + "', '', '', NULL, '2', '0.000000', NULL, '0', '0.0', '0.0', '0.0', '" + Utils.getData() + "', '1', '1', '0.0', 'PLN', NULL, NULL, 'PL', '0', '0', '0', '" + Utils.getData() + "', '', '4', '0', '0', '" + Utils.getData() + "', 'PAR/" + lastFactur.getFULLIDFVConformed() + "/"+ Utils.getLastTwoDigistsOfYear() + "', '', '0', '1900-01-01 00:00:00', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1900-01-01 00:00:00', '0', NULL, NULL, '0', '2', '1900-01-01 00:00:00', '0', '0', '00000000-0000-0000-0000-000000000000', '0', '0', '', '0.00', 'PLN', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1900-01-01 00:00:00', '1900-01-01 00:00:00', '0', '1900-01-01 00:00:00', '', '176', '0', NULL, '0', '0')";
+           sql = "INSERT INTO `DokHandlowe` (`ID`, `Guid`, `Exported`, `Kategoria`, `Stan`, `Potwierdzenie`, `Definicja`, `Magazyn`, `TypPartii`, `KierunekMagazynu`, `SposobRozliczaniaNadrzednego`, `NumerSymbol`, `NumerNumer`, `NumerPelny`, `Seria`, `Data`, `Czas`, `DataOperacji`, `Kontrahent`, `Odbiorca`, `Osoba`, `SymbolKasy`, `ObcyDataOtrzymania`, `ObcyNumer`, `DostawaTermin`, `DostawaSposob`, `DostawaOdpowiedzialny`, `OsobaKontrahenta`, `LiczonaOd`, `Rabat`, `DefinicjaEwidencji`, `KorektaVAT`, `SumaNetto`, `SumaVAT`, `SumaBrutto`, `DataKursu`, `TabelaKursowa`, `KursWaluty`, `BruttoCyValue`, `BruttoCySymbol`, `Poprawiajacy`, `Pracownik`, `MiejsceSwiadczenia`, `WarunkiDostawy`, `RodzajTransportu`, `RodzajTransakcji`, `OkresIntrastat`, `Opis`, `MaxIdent`, `Korekta`, `SposobPrzenoszeniaZaliczki`, `Stamp`, `NumerPelnyZapisany`, `SeriaZapisana`, `CzestotliwoscRozliczania`, `TerminRozliczenia`, `TypTerminuRozliczenia`, `Flags`, `RozliczanieZbiorcze`, `CenaNaPodrzedny`, `RodzajPlatnosciKaucji`, `UmowaInfoCyklKrotnosc`, `UmowaInfoCyklInterwal`, `UmowaInfoCyklTyp`, `UmowaInfoCyklCzas`, `UmowaInfoCyklPozycjaDnia`, `UmowaInfoCyklRodzajTerminu`, `UmowaInfoCyklSposobNaDniWolne`, `UmowaInfoCyklOkresCyklu`, `UmowaInfoCyklTermin`, `UmowaInfoDataOkresuRozliczeniowego`, `UmowaInfoWgZuzycia`, `UmowaInfoDomyslnyPodrzedny`, `OdbiorcaMiejsceDostawy`, `PrecyzjaCenyWymuszaj`, `PrecyzjaCenyPrecyzja`, `TerminRozliczeniaKaucji`, `InwentaryzacjaInfoBlokowanieTowarow`, `Podpisany`, `ProdukcjaInfoIdentyfikatorElementuPowiazanego`, `ZmianaParametrowZasobuInfoZmianaParametrowZasobu`, `ZmianaParametrowZasobuInfoIloscValue`, `ZmianaParametrowZasobuInfoIloscSymbol`, `ZmianaParametrowZasobuInfoWartoscCyValue`, `ZmianaParametrowZasobuInfoWartoscCySymbol`, `UmowaInfoCyklTermin2`, `UmowaInfoCyklTermin3`, `UmowaInfoCyklTermin4`, `UmowaInfoCyklTermin5`, `UmowaInfoCyklPozycjaDniaZaawansowana`, `DostawaCyklKrotnosc`, `DostawaCyklInterwal`, `DostawaCyklTyp`, `DostawaCyklCzas`, `DostawaCyklPozycjaDnia`, `DostawaCyklRodzajTerminu`, `DostawaCyklSposobNaDniWolne`, `DostawaCyklOkresCyklu`, `DostawaCyklTermin`, `DostawaCyklTermin2`, `DostawaCyklTermin3`, `DostawaCyklTermin4`, `DostawaCyklTermin5`, `DostawaCyklPozycjaDniaZaawansowana`, `EDokumentStatus`, `BuforOpisuAnalitycznego`, `OkresFrom`, `OkresTo`, `EDokumentRodzaj`, `EDokumentStatusData`, `FiltrZasobow`, `KrajPodatkuVat`, `PodzialKosztuDodatkowego`, `CechaPodzialuKosztuDodatkowego`, `RealizacjaStan`, `RealizacjaWynik`) VALUES (NULL, '" + lastFactur.getLastGUID() + "', '0', '2', '0', '0', '6', '1', '0', '-1', '0', 'PAR/*/" + Utils.getLastTwoDigistsOfYear() + "', '"+ lastFactur.getLastFactureId() + "', 'PAR/"+ lastFactur.getFULLIDFVConformed() + "/"+Utils.getLastTwoDigistsOfYear() + "', '', '" + Utils.getData() + "', '" + rand + "', '" + Utils.getData() + "', '1', '1', '', NULL, '" + Utils.getData() + "', '', '" + Utils.getData() + "', '', '', NULL, '2', '0.000000', NULL, '0', '0.0', '0.0', '0.0', '" + Utils.getData() + "', '1', '1', '0.0', 'PLN', NULL, NULL, 'PL', '0', '0', '0', '" + Utils.getData() + "', '', '" + products.size() + "', '0', '0', '" + Utils.getData() + "', 'PAR/" + lastFactur.getFULLIDFVConformed() + "/"+ Utils.getLastTwoDigistsOfYear() + "', '', '0', '1900-01-01 00:00:00', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1900-01-01 00:00:00', '0', NULL, NULL, '0', '2', '1900-01-01 00:00:00', '0', '0', '00000000-0000-0000-0000-000000000000', '0', '0', '', '0.00', 'PLN', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1900-01-01 00:00:00', '1900-01-01 00:00:00', '0', '1900-01-01 00:00:00', '', '176', '0', NULL, '0', '0')";
          }else {
-            sql = "INSERT INTO `DokHandlowe` (`ID`, `Guid`, `Exported`, `Kategoria`, `Stan`, `Potwierdzenie`, `Definicja`, `Magazyn`, `TypPartii`, `KierunekMagazynu`, `FiltrZasobow`, `SposobRozliczaniaNadrzednego`, `NumerSymbol`, `NumerNumer`, `NumerPelny`, `NumerPelnyZapisany`, `Seria`, `SeriaZapisana`, `Data`, `Czas`, `DataOperacji`, `CzestotliwoscRozliczania`, `TerminRozliczenia`, `TypTerminuRozliczenia`, `RozliczanieZbiorcze`, `CenaNaPodrzedny`, `UmowaInfoCyklKrotnosc`, `UmowaInfoCyklInterwal`, `UmowaInfoCyklTyp`, `UmowaInfoCyklCzas`, `UmowaInfoCyklPozycjaDnia`, `UmowaInfoCyklRodzajTerminu`, `UmowaInfoCyklSposobNaDniWolne`, `UmowaInfoCyklOkresCyklu`, `UmowaInfoCyklTermin`, `UmowaInfoCyklTermin2`, `UmowaInfoCyklTermin3`, `UmowaInfoCyklTermin4`, `UmowaInfoCyklTermin5`, `UmowaInfoCyklPozycjaDniaZaawansowana`, `UmowaInfoDataOkresuRozliczeniowego`, `UmowaInfoWgZuzycia`, `UmowaInfoDomyslnyPodrzedny`, `Kontrahent`, `Odbiorca`, `OdbiorcaMiejsceDostawy`, `Osoba`, `SymbolKasy`, `ObcyDataOtrzymania`, `ObcyNumer`, `DostawaTermin`, `DostawaSposob`, `DostawaOdpowiedzialny`, `DostawaCyklKrotnosc`, `DostawaCyklInterwal`, `DostawaCyklTyp`, `DostawaCyklCzas`, `DostawaCyklPozycjaDnia`, `DostawaCyklRodzajTerminu`, `DostawaCyklSposobNaDniWolne`, `DostawaCyklOkresCyklu`, `DostawaCyklTermin`, `DostawaCyklTermin2`, `DostawaCyklTermin3`, `DostawaCyklTermin4`, `DostawaCyklTermin5`, `DostawaCyklPozycjaDniaZaawansowana`, `OsobaKontrahenta`, `LiczonaOd`, `Rabat`, `PrecyzjaCenyPrecyzja`, `PrecyzjaCenyWymuszaj`, `DefinicjaEwidencji`, `KorektaVAT`, `SumaNetto`, `SumaVAT`, `SumaBrutto`, `KrajPodatkuVat`, `DataKursu`, `TabelaKursowa`, `KursWaluty`, `BruttoCyValue`, `BruttoCySymbol`, `Poprawiajacy`, `Pracownik`, `MiejsceSwiadczenia`, `WarunkiDostawy`, `RodzajTransportu`, `RodzajTransakcji`, `OkresIntrastat`, `Opis`, `MaxIdent`, `Korekta`, `SposobPrzenoszeniaZaliczki`, `RodzajPlatnosciKaucji`, `TerminRozliczeniaKaucji`, `InwentaryzacjaInfoBlokowanieTowarow`, `Flags`, `Podpisany`, `EDokumentStatus`, `ProdukcjaInfoIdentyfikatorElementuPowiazanego`, `ZmianaParametrowZasobuInfoZmianaParametrowZasobu`, `ZmianaParametrowZasobuInfoIloscValue`, `ZmianaParametrowZasobuInfoIloscSymbol`, `ZmianaParametrowZasobuInfoWartoscCyValue`, `ZmianaParametrowZasobuInfoWartoscCySymbol`, `BuforOpisuAnalitycznego`, `OkresFrom`, `OkresTo`, `EDokumentRodzaj`, `EDokumentStatusData`, `PodzialKosztuDodatkowego`, `CechaPodzialuKosztuDodatkowego`, `RealizacjaStan`, `RealizacjaWynik`, `Stamp`) VALUES (NULL, '" + lastFactur.getLastGUID() + "', '0', '2', '0', '0', '1', '1', '0', '-1', '', '0', 'FV/*/" + Utils.getLastTwoDigistsOfYear() + "', '" + lastFactur.getLastFactureId() + "', 'FV/" + lastFactur.getFULL() + "/" + Utils.getLastTwoDigistsOfYear() + "', '', '', '', '" + Utils.getDataShort() + "', '928', '" + Utils.getDataShort() + "', '0', '1900-01-01 00:00:00', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1900-01-01 00:00:00', '0', NULL, NULL, NULL, NULL, '', '', '" + Utils.getDataShort() + "', '', '" + Utils.getDataShort() + "', '', '', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', NULL, '1', '0.000000', '1', '0', '71', '0', '0.00', '0.00', '0.00', '176', '" + Utils.getDataShort() + "', '1', '1', '0.00', 'PLN', NULL, NULL, 'PL', '0', '0', '0', '" + Utils.getDataShort() + "', '', '" + products.size() + "', '0', '0', '0', '1900-01-01 00:00:00', '0', '0', '0', '0', '00000000-0000-0000-0000-000000000000', '0', '0', '', '0.00', 'PLN', '1', '1900-01-01 00:00:00', '1900-01-01 00:00:00', '0', '1900-01-01 00:00:00', '0', NULL, '0', '0', '" + Utils.getData() + "')";
+            sql = "INSERT INTO `DokHandlowe` (`ID`, `Guid`, `Exported`, `Kategoria`, `Stan`, `Potwierdzenie`, `Definicja`, `Magazyn`, `TypPartii`, `KierunekMagazynu`, `FiltrZasobow`, `SposobRozliczaniaNadrzednego`, `NumerSymbol`, `NumerNumer`, `NumerPelny`, `NumerPelnyZapisany`, `Seria`, `SeriaZapisana`, `Data`, `Czas`, `DataOperacji`, `CzestotliwoscRozliczania`, `TerminRozliczenia`, `TypTerminuRozliczenia`, `RozliczanieZbiorcze`, `CenaNaPodrzedny`, `UmowaInfoCyklKrotnosc`, `UmowaInfoCyklInterwal`, `UmowaInfoCyklTyp`, `UmowaInfoCyklCzas`, `UmowaInfoCyklPozycjaDnia`, `UmowaInfoCyklRodzajTerminu`, `UmowaInfoCyklSposobNaDniWolne`, `UmowaInfoCyklOkresCyklu`, `UmowaInfoCyklTermin`, `UmowaInfoCyklTermin2`, `UmowaInfoCyklTermin3`, `UmowaInfoCyklTermin4`, `UmowaInfoCyklTermin5`, `UmowaInfoCyklPozycjaDniaZaawansowana`, `UmowaInfoDataOkresuRozliczeniowego`, `UmowaInfoWgZuzycia`, `UmowaInfoDomyslnyPodrzedny`, `Kontrahent`, `Odbiorca`, `OdbiorcaMiejsceDostawy`, `Osoba`, `SymbolKasy`, `ObcyDataOtrzymania`, `ObcyNumer`, `DostawaTermin`, `DostawaSposob`, `DostawaOdpowiedzialny`, `DostawaCyklKrotnosc`, `DostawaCyklInterwal`, `DostawaCyklTyp`, `DostawaCyklCzas`, `DostawaCyklPozycjaDnia`, `DostawaCyklRodzajTerminu`, `DostawaCyklSposobNaDniWolne`, `DostawaCyklOkresCyklu`, `DostawaCyklTermin`, `DostawaCyklTermin2`, `DostawaCyklTermin3`, `DostawaCyklTermin4`, `DostawaCyklTermin5`, `DostawaCyklPozycjaDniaZaawansowana`, `OsobaKontrahenta`, `LiczonaOd`, `Rabat`, `PrecyzjaCenyPrecyzja`, `PrecyzjaCenyWymuszaj`, `DefinicjaEwidencji`, `KorektaVAT`, `SumaNetto`, `SumaVAT`, `SumaBrutto`, `KrajPodatkuVat`, `DataKursu`, `TabelaKursowa`, `KursWaluty`, `BruttoCyValue`, `BruttoCySymbol`, `Poprawiajacy`, `Pracownik`, `MiejsceSwiadczenia`, `WarunkiDostawy`, `RodzajTransportu`, `RodzajTransakcji`, `OkresIntrastat`, `Opis`, `MaxIdent`, `Korekta`, `SposobPrzenoszeniaZaliczki`, `RodzajPlatnosciKaucji`, `TerminRozliczeniaKaucji`, `InwentaryzacjaInfoBlokowanieTowarow`, `Flags`, `Podpisany`, `EDokumentStatus`, `ProdukcjaInfoIdentyfikatorElementuPowiazanego`, `ZmianaParametrowZasobuInfoZmianaParametrowZasobu`, `ZmianaParametrowZasobuInfoIloscValue`, `ZmianaParametrowZasobuInfoIloscSymbol`, `ZmianaParametrowZasobuInfoWartoscCyValue`, `ZmianaParametrowZasobuInfoWartoscCySymbol`, `BuforOpisuAnalitycznego`, `OkresFrom`, `OkresTo`, `EDokumentRodzaj`, `EDokumentStatusData`, `PodzialKosztuDodatkowego`, `CechaPodzialuKosztuDodatkowego`, `RealizacjaStan`, `RealizacjaWynik`, `Stamp`) VALUES (NULL, '" + lastFactur.getLastGUID() + "', '0', '2', '0', '0', '1', '1', '0', '-1', '', '0', 'FV/*/" + Utils.getLastTwoDigistsOfYear() + "', '" + lastFactur.getLastFactureId() + "', 'FV/" + lastFactur.getFULL() + "/" + Utils.getLastTwoDigistsOfYear() + "', 'FV/" + lastFactur.getFULL() + "/" + Utils.getLastTwoDigistsOfYear() + "', '', '', '" + Utils.getData() + "', '" + rand + "', '" + Utils.getData() + "', '0', '1900-01-01 00:00:00', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1900-01-01 00:00:00', '0', NULL, '" + kontrahent +"',NULL, NULL, '', '', '" + Utils.getDataShort() + "', '', '" + Utils.getDataShort() + "', '', '', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', NULL, '1', '0.000000', '1', '0', '71', '0', '0.00', '0.00', '0.00', '176', '" + Utils.getData() + "', '1', '1', '0.00', 'PLN', NULL, NULL, 'PL', '0', '0', '0', '" + Utils.getData() + "', '', '" + products.size() + "', '0', '0', '0', '1900-01-01 00:00:00', '0', '0', '0', '0', '00000000-0000-0000-0000-000000000000', '0', '0', '', '0.00', 'PLN', '1', '1900-01-01 00:00:00', '1900-01-01 00:00:00', '0', '1900-01-01 00:00:00', '0', NULL, '0', '0', '" + Utils.getData() + "')";
 
         }
         dialog.setMessage("Wstrzykuje dokument");
@@ -181,12 +189,13 @@ public class NewDocumentActivity extends Activity {
     }
 
     private void confirmCreateDocument() {
+
         new AlertDialog.Builder(this)
                 .setTitle("Czy na pewno chcesz zatwierdzić?")
                 .setMessage("Po zatwierdzeniu dokumentu nie będzie już odwrotu!")
                 .setPositiveButton("Tak!", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        checkStany();
+                        showKontrahent();
                         dialog.dismiss();
                     }
                 })
@@ -302,7 +311,7 @@ public class NewDocumentActivity extends Activity {
         Utils.checkWifiConnectionWithMessage(this);
         // TODO TEST
         new  MakeLoad().execute(manager);
-       // tests();
+       tests();
     }
 
 
@@ -335,6 +344,37 @@ public class NewDocumentActivity extends Activity {
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
+
+    public  void showKontrahent() {
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.custom_kontrahent);
+        dialog.setTitle("Wpisz kontrahenta");
+
+        // set the custom dialog components - text, image and button
+
+        final EditText editText = (EditText) dialog.findViewById(R.id.editTextKontrahent);
+
+        Button dialogRefresh = (Button) dialog.findViewById(R.id.buttonKontrahent);
+        dialogRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+              if(editText.getText().toString() != ""){
+                  kontrahent = editText.getText().toString();
+                  new AsyncKontrahent().execute("SELECT * FROM Kontrahenci WHERE Kod="+kontrahent);
+
+                  dialog.dismiss();
+
+              }else{
+                  Toast.makeText(NewDocumentActivity.this, "Kontrahent nie może być pusty", Toast.LENGTH_LONG);
+              }
+            }
+        });
+
+
+
+        dialog.show();
+    }
+    String kontrahent = "";
 
     private void addToListOrMenu() {
 
@@ -383,7 +423,7 @@ public class NewDocumentActivity extends Activity {
     // Tutaj musimy wdrożyć pobieranie partii
     public List<Product> listOfProduct = new ArrayList<Product>();
     public boolean hasMoreThanOne = false;
-    HashMap<String, String> doce = new HashMap<String, String>();
+
     private class AsyncGetProductByCode extends AsyncTask<String ,Void,Boolean> {
 
 
@@ -405,7 +445,6 @@ public class NewDocumentActivity extends Activity {
         @Override
         protected Boolean doInBackground(String... params) {
             listOfProduct.clear();
-            doce.clear();
             Statement statement = null;
             Statement statement1 = null;
             Statement statement2 = null;
@@ -420,16 +459,18 @@ public class NewDocumentActivity extends Activity {
                 Product product;
                 boolean pusto = true;
                 while (rs.next()) {
-                    pusto = false;
-                    product = new Product(rs.getString("Nazwa"), rs.getString("id"));
 
+                    product = new Product(rs.getString("Nazwa"), rs.getString("id"), rs.getString("DefinicjaStawki"));
+
+                    Log.e("stawka", "Definicja stawki to: " + product.getDefStawki());
                     // TUTAJ ZAPISANE SĄ ZASOBY
-                    ResultSet rs1 = statement1.executeQuery("SELECT * FROM Zasoby WHERE Towar = " + product.getId());
 
+                    ResultSet rs1 = statement1.executeQuery("SELECT * FROM Zasoby WHERE Towar = " + product.getId() + " AND Okres=1;");
                     List<String> listDocHan = new ArrayList<>();
                     while (rs1.next()) {
+                        pusto = false;
                         listDocHan.add(rs1.getString("PartiaDokument"));
-                        Log.e("Debug", "Znalazłem zasób");
+                        Log.e("Debug", "Znalazłem zasób " + rs1.getString("ID"));
                     }
 
 
@@ -437,10 +478,12 @@ public class NewDocumentActivity extends Activity {
                     List<String> listOfPozycjeID = new ArrayList<String>();
                     ResultSet rs3;
                     for (String s : listDocHan) {
+                        pusto = false;
                         rs3 = statement3.executeQuery("SELECT * FROM PozycjeDokHan WHERE Dokument = '" + s + "' AND Towar = " + product.getId() + ";");
                         while (rs3.next()) {
                             listOfPozycjeID.add(rs3.getString("ID"));
-                            Log.e("Debug", "Znalazłem dodanie w PozycjachDokHan");
+                            Log.e("pozycja", "nowa pozycja dok: " +rs3.getString("ID") );
+
                         }
                     }
                     // Teraz odczytuje partie
@@ -453,38 +496,44 @@ public class NewDocumentActivity extends Activity {
                     for (String s : listOfPozycjeID) {
                         rs2 = statement2.executeQuery("SELECT * FROM Features WHERE Parent = '" + s + "' AND Name = 'Nr_partii'");
                         while (rs2.next()) {
-                            Product product1 = new Product(product.getName(), product.getId());
+                            Product product1 = new Product(product.getName(), product.getId(), product.getDefStawki());
                             product1.setPartion(rs2.getString("Data"));
-                            product1.setDoc(s);
                             product1.setHasPartion(true);
 
-                            // tutaj dodaje doce, trzeba uwzględnić dostawy
-                            if(doce.containsKey(product1.getPartion())){
-                                doce.put(product1.getPartion(), doce.get(product1.getPartion()) + "," + s);
-                            }else{
-                                doce.put(product1.getPartion(), s);
-                            }
+
 
                             Log.e("Debug", "Znalazłem partię " + rs2.getString("Data") + " a do niej doc: " + s);
                             addToListOfProducts(product1, true);
                             jestPartia = true;
+
+                            // tutaj dodaje doce, trzeba uwzględnić dostawy
+                            for(Product p : getListOfProducts()){
+                                if(p.getPartion().equals(rs2.getString("Data"))){
+                                    p.addDoc(s);
+                                    Log.e("debug", "Dodaje nowego doca do tej samej partii");
+                                }
+                            }
+
                         }
 
                     }
                     if (!jestPartia) {
-                        Product product1 = new Product(product.getName(), product.getId());
-                        addToListOfProducts(product1, false);
-                        product1.setHasPartion(false);
-
+                        // Jeżeli nie znalazłem pozycji to znaczy, że jest to fejkowe dodanie
+                        if(!listOfPozycjeID.isEmpty()) {
+                            Product product1 = new Product(product.getName(), product.getId(), product.getDefStawki());
+                            addToListOfProducts(product1, false);
+                            product1.setHasPartion(false);
+                        }
                     }
 
                     Log.e("debug", "obrót");
 
                 }
 
+                // Czy EAN istnieje?
                 if (pusto) {
                     return true;
-                } else {
+                }else {
                     return false;
                 }
 
@@ -492,7 +541,7 @@ public class NewDocumentActivity extends Activity {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            return false;
+            return true;
         }
 
 
@@ -503,7 +552,7 @@ public class NewDocumentActivity extends Activity {
             if(!aVoid) {
                 addToListOrMenu();
             }else{
-                Utils.createDialog(NewDocumentActivity.this, "Błąd", "Nie ma takiego kodu kreskowego");
+                Utils.createDialog(NewDocumentActivity.this, "Błąd", "Nie ma takiego kodu kreskowego, lub jego stan magazynowy jest równy 0");
             }
         }
     }
@@ -519,7 +568,9 @@ private void addToListOfProducts(Product p, boolean havePartion) {
     listOfProduct.add(p);
 }
 
-
+private List<Product> getListOfProducts() {
+    return listOfProduct;
+}
 
     private class dodajPozycje extends AsyncTask<String ,String,Boolean>{
 
@@ -531,7 +582,8 @@ private void addToListOfProducts(Product p, boolean havePartion) {
 
                 int lp = 1;
                 String sqlProdukt;
-
+                Random r = new Random();
+                int rand = r.nextInt(9999);
                 for (Product p : products) {
                     Log.e("debug", lastFactur.getFacturID());
                     Log.e("debugKRZAK", p.getId() + " " + p.getName());
@@ -543,12 +595,25 @@ private void addToListOfProducts(Product p, boolean havePartion) {
                         nazwa = p.getName();
                     }
 
+                    nazwa = nazwa.replaceAll("[^a-zA-Z1-9]", "");
+
+
+
 
                     if(isParagon){
-                        sqlProdukt = "INSERT INTO `PozycjeDokHan` (`ID`, `Dokument`, `Ident`, `Dostawa`, `KierunekMagazynu`, `Lp`, `Towar`, `Data`, `Czas`, `Nazwa`, `JestOpis`, `Opis`, `VATOdMarzy`, `DefinicjaStawki`, `DefinicjaPowstaniaObowiazkuVAT`, `StawkaStatus`, `StawkaProcent`, `StawkaZrodlowa`, `StawkaKraj`, `KrajowaStawkaVAT`, `SWW`, `PodstawaZwolnienia`, `NabywcaPodatnik`, `CenaValue`, `CenaSymbol`, `RabatCenyValue`, `RabatCenySymbol`, `Rabat`, `BezRabatu`, `KorektaCeny`, `KorektaRabatu`, `IloscValue`, `IloscSymbol`, `IloscMagazynuValue`, `IloscMagazynuSymbol`, `IloscRezerwowanaValue`, `IloscRezerwowanaSymbol`, `IloscZasobuValue`, `WartoscCyValue`, `WartoscCySymbol`, `SumaNetto`, `SumaVAT`, `SumaBrutto`, `StatusPozycji`, `UmowaInfoCyklKrotnosc`, `UmowaInfoCyklInterwal`, `UmowaInfoCyklTyp`, `UmowaInfoCyklCzas`, `UmowaInfoCyklPozycjaDnia`, `UmowaInfoCyklRodzajTerminu`, `UmowaInfoCyklSposobNaDniWolne`, `UmowaInfoCyklOkresCyklu`, `UmowaInfoCyklTermin`, `UmowaInfoCyklTermin2`, `UmowaInfoCyklTermin3`, `UmowaInfoCyklTermin4`, `UmowaInfoCyklTermin5`, `UmowaInfoCyklPozycjaDniaZaawansowana`, `UmowaInfoDataOkresuRozliczeniowego`, `UmowaInfoWgZuzycia`, `UmowaInfoDomyslnyPodrzedny`, `KompletacjaInfoWspolczynnikNum`, `KompletacjaInfoWspolczynnikDen`, `KompletacjaInfoDodatkowa`, `KompletacjaInfoProporcjaWartosci`, `KompletacjaInfoWartoscValue`, `KompletacjaInfoWartoscSymbol`, `Krotnosc`, `WOkresie`, `Dzien`, `OkresRozliczonyFrom`, `OkresRozliczonyTo`, `DataPrzecenOkresowych`, `KodCN`, `IloscUzupelniajacaValue`, `IloscUzupelniajacaSymbol`, `MasaNettoValue`, `MasaNettoSymbol`, `MasaBruttoValue`, `MasaBruttoSymbol`, `KrajPochodzenia`, `KrajPrzeznaczenia`, `RodzajTransakcji`, `KosztDodatkowy`, `KosztFakturowy`, `KosztStatystyczny`, `KosztMagazynowy`, `DoliczajKosztDodatkowy`, `NumerArkusza`, `NumerWArkuszu`, `WspolczynnikNum`, `WspolczynnikDen`, `Urzadzenie`, `StanPoczatkowyValue`, `StanPoczatkowySymbol`, `Flags`, `GTIN13`, `SchematOpakowan`, `IloscZrealizowanaValue`, `IloscZrealizowanaSymbol`, `ProdukcjaInfoIdentyfikatorElementuPowiazanego`, `ZaliczkaInfoBruttoCyValue`, `ZaliczkaInfoBruttoCySymbol`, `ZmianaParametrowZasobuInfoZmianaParametrowZasobu`, `ZmianaParametrowZasobuInfoIloscValue`, `ZmianaParametrowZasobuInfoIloscSymbol`, `ZmianaParametrowZasobuInfoWartoscCyValue`, `ZmianaParametrowZasobuInfoWartoscCySymbol`, `ParametryRezerwacjiDataOd`, `ParametryRezerwacjiDataDo`, `ParametryRezerwacjiCzasOd`, `ParametryRezerwacjiCzasDo`, `ParametryRezerwacjiPriorytet`, `Stamp`) VALUES (NULL, '" + lastFactur.getFacturID() + "', '" + (lp) + "', NULL, '-1', '" + lp + "', '" + p.getId() + "', '" + Utils.getDataShort() + "', '1012', '" + nazwa + "', '0', NULL, '0', '10', NULL, '0', '0.230000', '0.230000', '176', '0', '', '', '0', '0.00', 'PLN', '0', 'PLN', '0.000000', '0', '0', '0', '" + p.getCount() + "', 'szt', '" + p.getCount() + "', 'szt', '0', '', '" + p.getCount() + "', '0.00', 'PLN', '0.00', '0.00', '0.00', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '" + Utils.getDataShort() + "', '0', NULL, '0', '0', '0', '0', '0.00', 'PLN', '0', '0', '0', '1900-01-01 00:00:00', '1900-01-01 00:00:00', '1900-01-01 00:00:00', '61123110', '0', '$$$', '0', 'kg', '0', 'kg', '', '', '0', '0', '0.00', '0.00', '0.00', '0', '', '0', '1', '1', NULL, '0', '$$$', '0', '', NULL, '0', 'szt', '00000000-0000-0000-0000-000000000000', '0.00', 'PLN', '0', '0', '', '0.00', 'PLN', '1900-01-01 00:00:00', '1900-01-01 00:00:00', '0', '0', NULL, '" + Utils.getData() + "')";
+                        if (p.isHasPartion()){
+                            sqlProdukt = "INSERT INTO `PozycjeDokHan` (`ID`, `Dokument`, `Ident`, `Dostawa`, `KierunekMagazynu`, `Lp`, `Towar`, `Data`, `Czas`, `Nazwa`, `JestOpis`, `Opis`, `VATOdMarzy`, `DefinicjaStawki`, `DefinicjaPowstaniaObowiazkuVAT`, `StawkaStatus`, `StawkaProcent`, `StawkaZrodlowa`, `StawkaKraj`, `KrajowaStawkaVAT`, `SWW`, `PodstawaZwolnienia`, `NabywcaPodatnik`, `CenaValue`, `CenaSymbol`, `RabatCenyValue`, `RabatCenySymbol`, `Rabat`, `BezRabatu`, `KorektaCeny`, `KorektaRabatu`, `IloscValue`, `IloscSymbol`, `IloscMagazynuValue`, `IloscMagazynuSymbol`, `IloscRezerwowanaValue`, `IloscRezerwowanaSymbol`, `IloscZasobuValue`, `WartoscCyValue`, `WartoscCySymbol`, `SumaNetto`, `SumaVAT`, `SumaBrutto`, `StatusPozycji`, `UmowaInfoCyklKrotnosc`, `UmowaInfoCyklInterwal`, `UmowaInfoCyklTyp`, `UmowaInfoCyklCzas`, `UmowaInfoCyklPozycjaDnia`, `UmowaInfoCyklRodzajTerminu`, `UmowaInfoCyklSposobNaDniWolne`, `UmowaInfoCyklOkresCyklu`, `UmowaInfoCyklTermin`, `UmowaInfoCyklTermin2`, `UmowaInfoCyklTermin3`, `UmowaInfoCyklTermin4`, `UmowaInfoCyklTermin5`, `UmowaInfoCyklPozycjaDniaZaawansowana`, `UmowaInfoDataOkresuRozliczeniowego`, `UmowaInfoWgZuzycia`, `UmowaInfoDomyslnyPodrzedny`, `KompletacjaInfoWspolczynnikNum`, `KompletacjaInfoWspolczynnikDen`, `KompletacjaInfoDodatkowa`, `KompletacjaInfoProporcjaWartosci`, `KompletacjaInfoWartoscValue`, `KompletacjaInfoWartoscSymbol`, `Krotnosc`, `WOkresie`, `Dzien`, `OkresRozliczonyFrom`, `OkresRozliczonyTo`, `DataPrzecenOkresowych`, `KodCN`, `IloscUzupelniajacaValue`, `IloscUzupelniajacaSymbol`, `MasaNettoValue`, `MasaNettoSymbol`, `MasaBruttoValue`, `MasaBruttoSymbol`, `KrajPochodzenia`, `KrajPrzeznaczenia`, `RodzajTransakcji`, `KosztDodatkowy`, `KosztFakturowy`, `KosztStatystyczny`, `KosztMagazynowy`, `DoliczajKosztDodatkowy`, `NumerArkusza`, `NumerWArkuszu`, `WspolczynnikNum`, `WspolczynnikDen`, `Urzadzenie`, `StanPoczatkowyValue`, `StanPoczatkowySymbol`, `Flags`, `GTIN13`, `SchematOpakowan`, `IloscZrealizowanaValue`, `IloscZrealizowanaSymbol`, `ProdukcjaInfoIdentyfikatorElementuPowiazanego`, `ZaliczkaInfoBruttoCyValue`, `ZaliczkaInfoBruttoCySymbol`, `ZmianaParametrowZasobuInfoZmianaParametrowZasobu`, `ZmianaParametrowZasobuInfoIloscValue`, `ZmianaParametrowZasobuInfoIloscSymbol`, `ZmianaParametrowZasobuInfoWartoscCyValue`, `ZmianaParametrowZasobuInfoWartoscCySymbol`, `ParametryRezerwacjiDataOd`, `ParametryRezerwacjiDataDo`, `ParametryRezerwacjiCzasOd`, `ParametryRezerwacjiCzasDo`, `ParametryRezerwacjiPriorytet`, `Stamp`) VALUES (NULL, '" + lastFactur.getFacturID() + "', '" + (lp) + "','"+p.getWybranaDostawa() + "', '-1', '" + lp + "', '" + p.getId() + "', '" + Utils.getDataShort() + "', '" + rand + "', '" + nazwa + "', '0', NULL, '0', '" + p.getDefStawki() + "', NULL, '0', NULL, NULL, '176', '0', '', '', '0', '0.00', 'PLN', '0', 'PLN', '0.000000', '0', '0', '0', '" + p.getCount() + "', 'szt', '" + p.getCount() + "', 'szt', '0', '', '" + p.getCount() + "', '0.00', 'PLN', '0.00', '0.00', '0.00', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '" + Utils.getDataShort() + "', '0', NULL, '0', '0', '0', '0', '0.00', 'PLN', '0', '0', '0', '1900-01-01 00:00:00', '1900-01-01 00:00:00', '1900-01-01 00:00:00', '', '0', '$$$', '0', 'kg', '0', 'kg', '', '', '0', '0', '0.00', '0.00', '0.00', '0', '', '0', '1', '1', NULL, '0', '$$$', '0', '', NULL, '0', 'szt', '00000000-0000-0000-0000-000000000000', '0.00', 'PLN', '0', '0', '', '0.00', 'PLN', '1900-01-01 00:00:00', '1900-01-01 00:00:00', '0', '0', NULL, '" + Utils.getData() + "')";
+                        }else{
+                            sqlProdukt = "INSERT INTO `PozycjeDokHan` (`ID`, `Dokument`, `Ident`, `Dostawa`, `KierunekMagazynu`, `Lp`, `Towar`, `Data`, `Czas`, `Nazwa`, `JestOpis`, `Opis`, `VATOdMarzy`, `DefinicjaStawki`, `DefinicjaPowstaniaObowiazkuVAT`, `StawkaStatus`, `StawkaProcent`, `StawkaZrodlowa`, `StawkaKraj`, `KrajowaStawkaVAT`, `SWW`, `PodstawaZwolnienia`, `NabywcaPodatnik`, `CenaValue`, `CenaSymbol`, `RabatCenyValue`, `RabatCenySymbol`, `Rabat`, `BezRabatu`, `KorektaCeny`, `KorektaRabatu`, `IloscValue`, `IloscSymbol`, `IloscMagazynuValue`, `IloscMagazynuSymbol`, `IloscRezerwowanaValue`, `IloscRezerwowanaSymbol`, `IloscZasobuValue`, `WartoscCyValue`, `WartoscCySymbol`, `SumaNetto`, `SumaVAT`, `SumaBrutto`, `StatusPozycji`, `UmowaInfoCyklKrotnosc`, `UmowaInfoCyklInterwal`, `UmowaInfoCyklTyp`, `UmowaInfoCyklCzas`, `UmowaInfoCyklPozycjaDnia`, `UmowaInfoCyklRodzajTerminu`, `UmowaInfoCyklSposobNaDniWolne`, `UmowaInfoCyklOkresCyklu`, `UmowaInfoCyklTermin`, `UmowaInfoCyklTermin2`, `UmowaInfoCyklTermin3`, `UmowaInfoCyklTermin4`, `UmowaInfoCyklTermin5`, `UmowaInfoCyklPozycjaDniaZaawansowana`, `UmowaInfoDataOkresuRozliczeniowego`, `UmowaInfoWgZuzycia`, `UmowaInfoDomyslnyPodrzedny`, `KompletacjaInfoWspolczynnikNum`, `KompletacjaInfoWspolczynnikDen`, `KompletacjaInfoDodatkowa`, `KompletacjaInfoProporcjaWartosci`, `KompletacjaInfoWartoscValue`, `KompletacjaInfoWartoscSymbol`, `Krotnosc`, `WOkresie`, `Dzien`, `OkresRozliczonyFrom`, `OkresRozliczonyTo`, `DataPrzecenOkresowych`, `KodCN`, `IloscUzupelniajacaValue`, `IloscUzupelniajacaSymbol`, `MasaNettoValue`, `MasaNettoSymbol`, `MasaBruttoValue`, `MasaBruttoSymbol`, `KrajPochodzenia`, `KrajPrzeznaczenia`, `RodzajTransakcji`, `KosztDodatkowy`, `KosztFakturowy`, `KosztStatystyczny`, `KosztMagazynowy`, `DoliczajKosztDodatkowy`, `NumerArkusza`, `NumerWArkuszu`, `WspolczynnikNum`, `WspolczynnikDen`, `Urzadzenie`, `StanPoczatkowyValue`, `StanPoczatkowySymbol`, `Flags`, `GTIN13`, `SchematOpakowan`, `IloscZrealizowanaValue`, `IloscZrealizowanaSymbol`, `ProdukcjaInfoIdentyfikatorElementuPowiazanego`, `ZaliczkaInfoBruttoCyValue`, `ZaliczkaInfoBruttoCySymbol`, `ZmianaParametrowZasobuInfoZmianaParametrowZasobu`, `ZmianaParametrowZasobuInfoIloscValue`, `ZmianaParametrowZasobuInfoIloscSymbol`, `ZmianaParametrowZasobuInfoWartoscCyValue`, `ZmianaParametrowZasobuInfoWartoscCySymbol`, `ParametryRezerwacjiDataOd`, `ParametryRezerwacjiDataDo`, `ParametryRezerwacjiCzasOd`, `ParametryRezerwacjiCzasDo`, `ParametryRezerwacjiPriorytet`, `Stamp`) VALUES (NULL, '" + lastFactur.getFacturID() + "', '" + (lp) + "', NULL, '-1', '" + lp + "', '" + p.getId() + "', '" + Utils.getDataShort() + "', '" + rand + "', '" + nazwa + "', '0', NULL, '0', '" + p.getDefStawki() + "', NULL, '0', NULL, NULL, '176', '0', '', '', '0', '0.00', 'PLN', '0', 'PLN', '0.000000', '0', '0', '0', '" + p.getCount() + "', 'szt', '" + p.getCount() + "', 'szt', '0', '', '" + p.getCount() + "', '0.00', 'PLN', '0.00', '0.00', '0.00', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '" + Utils.getDataShort() + "', '0', NULL, '0', '0', '0', '0', '0.00', 'PLN', '0', '0', '0', '1900-01-01 00:00:00', '1900-01-01 00:00:00', '1900-01-01 00:00:00', '', '0', '$$$', '0', 'kg', '0', 'kg', '', '', '0', '0', '0.00', '0.00', '0.00', '0', '', '0', '1', '1', NULL, '0', '$$$', '0', '', NULL, '0', 'szt', '00000000-0000-0000-0000-000000000000', '0.00', 'PLN', '0', '0', '', '0.00', 'PLN', '1900-01-01 00:00:00', '1900-01-01 00:00:00', '0', '0', NULL, '" + Utils.getData() + "')";
 
+                        }
                     }else {
-                        sqlProdukt = "INSERT INTO `PozycjeDokHan` (`ID`, `Dokument`, `Ident`, `Dostawa`, `KierunekMagazynu`, `Lp`, `Towar`, `Data`, `Czas`, `Nazwa`, `JestOpis`, `Opis`, `VATOdMarzy`, `DefinicjaStawki`, `DefinicjaPowstaniaObowiazkuVAT`, `StawkaStatus`, `StawkaProcent`, `StawkaZrodlowa`, `StawkaKraj`, `KrajowaStawkaVAT`, `SWW`, `PodstawaZwolnienia`, `NabywcaPodatnik`, `CenaValue`, `CenaSymbol`, `RabatCenyValue`, `RabatCenySymbol`, `Rabat`, `BezRabatu`, `KorektaCeny`, `KorektaRabatu`, `IloscValue`, `IloscSymbol`, `IloscMagazynuValue`, `IloscMagazynuSymbol`, `IloscRezerwowanaValue`, `IloscRezerwowanaSymbol`, `IloscZasobuValue`, `WartoscCyValue`, `WartoscCySymbol`, `SumaNetto`, `SumaVAT`, `SumaBrutto`, `StatusPozycji`, `UmowaInfoCyklKrotnosc`, `UmowaInfoCyklInterwal`, `UmowaInfoCyklTyp`, `UmowaInfoCyklCzas`, `UmowaInfoCyklPozycjaDnia`, `UmowaInfoCyklRodzajTerminu`, `UmowaInfoCyklSposobNaDniWolne`, `UmowaInfoCyklOkresCyklu`, `UmowaInfoCyklTermin`, `UmowaInfoCyklTermin2`, `UmowaInfoCyklTermin3`, `UmowaInfoCyklTermin4`, `UmowaInfoCyklTermin5`, `UmowaInfoCyklPozycjaDniaZaawansowana`, `UmowaInfoDataOkresuRozliczeniowego`, `UmowaInfoWgZuzycia`, `UmowaInfoDomyslnyPodrzedny`, `KompletacjaInfoWspolczynnikNum`, `KompletacjaInfoWspolczynnikDen`, `KompletacjaInfoDodatkowa`, `KompletacjaInfoProporcjaWartosci`, `KompletacjaInfoWartoscValue`, `KompletacjaInfoWartoscSymbol`, `Krotnosc`, `WOkresie`, `Dzien`, `OkresRozliczonyFrom`, `OkresRozliczonyTo`, `DataPrzecenOkresowych`, `KodCN`, `IloscUzupelniajacaValue`, `IloscUzupelniajacaSymbol`, `MasaNettoValue`, `MasaNettoSymbol`, `MasaBruttoValue`, `MasaBruttoSymbol`, `KrajPochodzenia`, `KrajPrzeznaczenia`, `RodzajTransakcji`, `KosztDodatkowy`, `KosztFakturowy`, `KosztStatystyczny`, `KosztMagazynowy`, `DoliczajKosztDodatkowy`, `NumerArkusza`, `NumerWArkuszu`, `WspolczynnikNum`, `WspolczynnikDen`, `Urzadzenie`, `StanPoczatkowyValue`, `StanPoczatkowySymbol`, `Flags`, `GTIN13`, `SchematOpakowan`, `IloscZrealizowanaValue`, `IloscZrealizowanaSymbol`, `ProdukcjaInfoIdentyfikatorElementuPowiazanego`, `ZaliczkaInfoBruttoCyValue`, `ZaliczkaInfoBruttoCySymbol`, `ZmianaParametrowZasobuInfoZmianaParametrowZasobu`, `ZmianaParametrowZasobuInfoIloscValue`, `ZmianaParametrowZasobuInfoIloscSymbol`, `ZmianaParametrowZasobuInfoWartoscCyValue`, `ZmianaParametrowZasobuInfoWartoscCySymbol`, `ParametryRezerwacjiDataOd`, `ParametryRezerwacjiDataDo`, `ParametryRezerwacjiCzasOd`, `ParametryRezerwacjiCzasDo`, `ParametryRezerwacjiPriorytet`, `Stamp`) VALUES (NULL, '" + lastFactur.getFacturID() + "', '" + (lp) + "', NULL, '-1', '" + (lp)  + "', '" + p.getId() + "', '" + Utils.getDataShort() + "', '1012', '" + nazwa + "', '0', NULL, '0', '10', NULL, '0', '0.230000', '0.230000', '176', '0', '', '', '0', '0.00', 'PLN', '0', 'PLN', '0.000000', '0', '0', '0', '" + p.getCount() + "', 'szt', '" + p.getCount() + "', 'szt', '0', '', '" + p.getCount() + "', '0.00', 'PLN', '0.00', '0.00', '0.00', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '" + Utils.getDataShort() + "', '0', NULL, '0', '0', '0', '0', '0.00', 'PLN', '0', '0', '0', '1900-01-01 00:00:00', '1900-01-01 00:00:00', '1900-01-01 00:00:00', '61123110', '0', '$$$', '0', 'kg', '0', 'kg', '', '', '0', '0', '0.00', '0.00', '0.00', '0', '', '0', '1', '1', NULL, '0', '$$$', '0', '', NULL, '0', 'szt', '00000000-0000-0000-0000-000000000000', '0.00', 'PLN', '0', '0', '', '0.00', 'PLN', '1900-01-01 00:00:00', '1900-01-01 00:00:00', '0', '0', NULL, '" + Utils.getData() + "')";
+                        if (p.isHasPartion()){
+                            sqlProdukt = "INSERT INTO `PozycjeDokHan` (`ID`, `Dokument`, `Ident`, `Dostawa`, `KierunekMagazynu`, `Lp`, `Towar`, `Data`, `Czas`, `Nazwa`, `JestOpis`, `Opis`, `VATOdMarzy`, `DefinicjaStawki`, `DefinicjaPowstaniaObowiazkuVAT`, `StawkaStatus`, `StawkaProcent`, `StawkaZrodlowa`, `StawkaKraj`, `KrajowaStawkaVAT`, `SWW`, `PodstawaZwolnienia`, `NabywcaPodatnik`, `CenaValue`, `CenaSymbol`, `RabatCenyValue`, `RabatCenySymbol`, `Rabat`, `BezRabatu`, `KorektaCeny`, `KorektaRabatu`, `IloscValue`, `IloscSymbol`, `IloscMagazynuValue`, `IloscMagazynuSymbol`, `IloscRezerwowanaValue`, `IloscRezerwowanaSymbol`, `IloscZasobuValue`, `WartoscCyValue`, `WartoscCySymbol`, `SumaNetto`, `SumaVAT`, `SumaBrutto`, `StatusPozycji`, `UmowaInfoCyklKrotnosc`, `UmowaInfoCyklInterwal`, `UmowaInfoCyklTyp`, `UmowaInfoCyklCzas`, `UmowaInfoCyklPozycjaDnia`, `UmowaInfoCyklRodzajTerminu`, `UmowaInfoCyklSposobNaDniWolne`, `UmowaInfoCyklOkresCyklu`, `UmowaInfoCyklTermin`, `UmowaInfoCyklTermin2`, `UmowaInfoCyklTermin3`, `UmowaInfoCyklTermin4`, `UmowaInfoCyklTermin5`, `UmowaInfoCyklPozycjaDniaZaawansowana`, `UmowaInfoDataOkresuRozliczeniowego`, `UmowaInfoWgZuzycia`, `UmowaInfoDomyslnyPodrzedny`, `KompletacjaInfoWspolczynnikNum`, `KompletacjaInfoWspolczynnikDen`, `KompletacjaInfoDodatkowa`, `KompletacjaInfoProporcjaWartosci`, `KompletacjaInfoWartoscValue`, `KompletacjaInfoWartoscSymbol`, `Krotnosc`, `WOkresie`, `Dzien`, `OkresRozliczonyFrom`, `OkresRozliczonyTo`, `DataPrzecenOkresowych`, `KodCN`, `IloscUzupelniajacaValue`, `IloscUzupelniajacaSymbol`, `MasaNettoValue`, `MasaNettoSymbol`, `MasaBruttoValue`, `MasaBruttoSymbol`, `KrajPochodzenia`, `KrajPrzeznaczenia`, `RodzajTransakcji`, `KosztDodatkowy`, `KosztFakturowy`, `KosztStatystyczny`, `KosztMagazynowy`, `DoliczajKosztDodatkowy`, `NumerArkusza`, `NumerWArkuszu`, `WspolczynnikNum`, `WspolczynnikDen`, `Urzadzenie`, `StanPoczatkowyValue`, `StanPoczatkowySymbol`, `Flags`, `GTIN13`, `SchematOpakowan`, `IloscZrealizowanaValue`, `IloscZrealizowanaSymbol`, `ProdukcjaInfoIdentyfikatorElementuPowiazanego`, `ZaliczkaInfoBruttoCyValue`, `ZaliczkaInfoBruttoCySymbol`, `ZmianaParametrowZasobuInfoZmianaParametrowZasobu`, `ZmianaParametrowZasobuInfoIloscValue`, `ZmianaParametrowZasobuInfoIloscSymbol`, `ZmianaParametrowZasobuInfoWartoscCyValue`, `ZmianaParametrowZasobuInfoWartoscCySymbol`, `ParametryRezerwacjiDataOd`, `ParametryRezerwacjiDataDo`, `ParametryRezerwacjiCzasOd`, `ParametryRezerwacjiCzasDo`, `ParametryRezerwacjiPriorytet`, `Stamp`) VALUES (NULL, '" + lastFactur.getFacturID() + "', '" + (lp) + "', '" + p.getWybranaDostawa() + "', '-1', '" + (lp) + "', '" + p.getId() + "', '" + Utils.getDataShort() + "', '" + rand + "', '" + nazwa + "', '0', NULL, '0', '" + p.getDefStawki() + "', NULL, '0', NULL, NULL, '176', '0', '', '', '0', '0.00', 'PLN', '0', 'PLN', '0.000000', '0', '0', '0', '" + p.getCount() + "', 'szt', '" + p.getCount() + "', 'szt', '0', '', '" + p.getCount() + "', '0.00', 'PLN', '0.00', '0.00', '0.00', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '" + Utils.getDataShort() + "', '0', NULL, '0', '0', '0', '0', '0.00', 'PLN', '0', '0', '0', '1900-01-01 00:00:00', '1900-01-01 00:00:00', '1900-01-01 00:00:00', '', '0', '$$$', '0', 'kg', '0', 'kg', '', '', '0', '0', '0.00', '0.00', '0.00', '0', '', '0', '1', '1', NULL, '0', '$$$', '0', '', NULL, '0', 'szt', '00000000-0000-0000-0000-000000000000', '0.00', 'PLN', '0', '0', '', '0.00', 'PLN', '1900-01-01 00:00:00', '1900-01-01 00:00:00', '0', '0', NULL, '" + Utils.getData() + "')";
+                         }else{
+                            sqlProdukt = "INSERT INTO `PozycjeDokHan` (`ID`, `Dokument`, `Ident`, `Dostawa`, `KierunekMagazynu`, `Lp`, `Towar`, `Data`, `Czas`, `Nazwa`, `JestOpis`, `Opis`, `VATOdMarzy`, `DefinicjaStawki`, `DefinicjaPowstaniaObowiazkuVAT`, `StawkaStatus`, `StawkaProcent`, `StawkaZrodlowa`, `StawkaKraj`, `KrajowaStawkaVAT`, `SWW`, `PodstawaZwolnienia`, `NabywcaPodatnik`, `CenaValue`, `CenaSymbol`, `RabatCenyValue`, `RabatCenySymbol`, `Rabat`, `BezRabatu`, `KorektaCeny`, `KorektaRabatu`, `IloscValue`, `IloscSymbol`, `IloscMagazynuValue`, `IloscMagazynuSymbol`, `IloscRezerwowanaValue`, `IloscRezerwowanaSymbol`, `IloscZasobuValue`, `WartoscCyValue`, `WartoscCySymbol`, `SumaNetto`, `SumaVAT`, `SumaBrutto`, `StatusPozycji`, `UmowaInfoCyklKrotnosc`, `UmowaInfoCyklInterwal`, `UmowaInfoCyklTyp`, `UmowaInfoCyklCzas`, `UmowaInfoCyklPozycjaDnia`, `UmowaInfoCyklRodzajTerminu`, `UmowaInfoCyklSposobNaDniWolne`, `UmowaInfoCyklOkresCyklu`, `UmowaInfoCyklTermin`, `UmowaInfoCyklTermin2`, `UmowaInfoCyklTermin3`, `UmowaInfoCyklTermin4`, `UmowaInfoCyklTermin5`, `UmowaInfoCyklPozycjaDniaZaawansowana`, `UmowaInfoDataOkresuRozliczeniowego`, `UmowaInfoWgZuzycia`, `UmowaInfoDomyslnyPodrzedny`, `KompletacjaInfoWspolczynnikNum`, `KompletacjaInfoWspolczynnikDen`, `KompletacjaInfoDodatkowa`, `KompletacjaInfoProporcjaWartosci`, `KompletacjaInfoWartoscValue`, `KompletacjaInfoWartoscSymbol`, `Krotnosc`, `WOkresie`, `Dzien`, `OkresRozliczonyFrom`, `OkresRozliczonyTo`, `DataPrzecenOkresowych`, `KodCN`, `IloscUzupelniajacaValue`, `IloscUzupelniajacaSymbol`, `MasaNettoValue`, `MasaNettoSymbol`, `MasaBruttoValue`, `MasaBruttoSymbol`, `KrajPochodzenia`, `KrajPrzeznaczenia`, `RodzajTransakcji`, `KosztDodatkowy`, `KosztFakturowy`, `KosztStatystyczny`, `KosztMagazynowy`, `DoliczajKosztDodatkowy`, `NumerArkusza`, `NumerWArkuszu`, `WspolczynnikNum`, `WspolczynnikDen`, `Urzadzenie`, `StanPoczatkowyValue`, `StanPoczatkowySymbol`, `Flags`, `GTIN13`, `SchematOpakowan`, `IloscZrealizowanaValue`, `IloscZrealizowanaSymbol`, `ProdukcjaInfoIdentyfikatorElementuPowiazanego`, `ZaliczkaInfoBruttoCyValue`, `ZaliczkaInfoBruttoCySymbol`, `ZmianaParametrowZasobuInfoZmianaParametrowZasobu`, `ZmianaParametrowZasobuInfoIloscValue`, `ZmianaParametrowZasobuInfoIloscSymbol`, `ZmianaParametrowZasobuInfoWartoscCyValue`, `ZmianaParametrowZasobuInfoWartoscCySymbol`, `ParametryRezerwacjiDataOd`, `ParametryRezerwacjiDataDo`, `ParametryRezerwacjiCzasOd`, `ParametryRezerwacjiCzasDo`, `ParametryRezerwacjiPriorytet`, `Stamp`) VALUES (NULL, '" + lastFactur.getFacturID() + "', '" + (lp) + "', NULL, '-1', '" + (lp) + "', '" + p.getId() + "', '" + Utils.getDataShort() + "', '" + rand + "', '" + nazwa + "', '0', NULL, '0', '" + p.getDefStawki() + "', NULL, '0', NULL, NULL, '176', '0', '', '', '0', '0.00', 'PLN', '0', 'PLN', '0.000000', '0', '0', '0', '" + p.getCount() + "', 'szt', '" + p.getCount() + "', 'szt', '0', '', '" + p.getCount() + "', '0.00', 'PLN', '0.00', '0.00', '0.00', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '" + Utils.getDataShort() + "', '0', NULL, '0', '0', '0', '0', '0.00', 'PLN', '0', '0', '0', '1900-01-01 00:00:00', '1900-01-01 00:00:00', '1900-01-01 00:00:00', '', '0', '$$$', '0', 'kg', '0', 'kg', '', '', '0', '0', '0.00', '0.00', '0.00', '0', '', '0', '1', '1', NULL, '0', '$$$', '0', '', NULL, '0', 'szt', '00000000-0000-0000-0000-000000000000', '0.00', 'PLN', '0', '0', '', '0.00', 'PLN', '1900-01-01 00:00:00', '1900-01-01 00:00:00', '0', '0', NULL, '" + Utils.getData() + "')";
+
+                        }
                     }
                     lp++;
 
@@ -582,6 +647,40 @@ private void addToListOfProducts(Product p, boolean havePartion) {
     }
 
 
+    @OnLongClick(R.id.buttonAdd)
+    public boolean onAddLongClick() {
+        customEAN();
+        return true;
+    }
+
+    private void customEAN() {
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.custom_ean);
+        //dialog.setTitle("Dodaj EAN");
+
+        // set the custom dialog components - text, image and button
+
+        final EditText editText = (EditText) dialog.findViewById(R.id.editTextKontrahent1);
+
+        Button dialogRefresh = (Button) dialog.findViewById(R.id.buttonKontrahent1);
+        Button dialogAnuluj = (Button) dialog.findViewById(R.id.buttonASD);
+        dialogRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+              result(editText.getText().toString());
+            }
+        });
+        dialogAnuluj.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+
+
+        dialog.show();
+    }
 
 
     private class Step1 extends AsyncTask<String ,Void,Boolean>{
@@ -653,6 +752,44 @@ private void addToListOfProducts(Product p, boolean havePartion) {
     }
 
 
+    private class AsyncKontrahent extends AsyncTask<String ,Void,ResultSet>{
+
+        @Override
+        protected ResultSet doInBackground(String ... params) {
+            Statement statement = null;
+            try {
+                statement = mysql.getConnection().createStatement();
+
+
+                return  statement.executeQuery(params[0]);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(ResultSet aVoid) {
+            //  Toast.makeText(NewDocumentActivity.this, "Wbiłem inserta! " + aVoid, Toast.LENGTH_SHORT).show();
+         int test = 0;
+            try {
+                while(aVoid.next()){
+
+                    test = 1;
+                    kontrahent = aVoid.getString("ID");
+
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            if(test == 1) {
+                checkStany();
+            }else{
+                Utils.createDialog(NewDocumentActivity.this, "Kontrahent", "Nie ma takiego kontrahenta");
+            }
+        }
+    }
 
 
 
@@ -790,37 +927,38 @@ private void addToListOfProducts(Product p, boolean havePartion) {
         protected Integer doInBackground(String ... params) {
             Statement statement = null;
             Statement statement1 = null;
-            int i = 0;
+
             try {
                 statement = mysql.getConnection().createStatement();
                 statement1 = mysql.getConnection().createStatement();
 
-
+                int i;
                 int counter1 = 1;
                 for (Product p : products) {
+                     i = 0;
                     if (p.isHasPartion()) {
 
                         // terz musze puscic petle bo tych docow jest wiecej niz 1
                         Log.e("debug", "ma partie");
                         List<String> doce = new ArrayList<String>();
-                        for (String s : p.getDoce()) {
+                        String s = p.getWybranaDostawa();
                             ResultSet rs1 = statement1.executeQuery("SELECT * FROM PozycjeDokHan WHERE ID=" + s);
 
                             while (rs1.next()) {
                                 doce.add(rs1.getString("Dokument"));
                             }
-                        }
+
                         int counter = 1;
-                        for (String s : doce) {
+                        for (String s1 : doce) {
                             String sql = "SELECT * FROM Zasoby WHERE Towar=" + p.getId() + " AND " +
-                                    "PartiaDokument=" + s + ";";
+                                    "PartiaDokument=" + s1 + ";";
 
 
                             ResultSet rs = statement.executeQuery(sql);
                             try {
                                 while (rs.next()) {
                                     i += Long.parseLong(rs.getString("IloscValue"));
-                                    p.addDostawa("Dostawa " + counter + ": " + rs.getString("IloscValue"));
+                                    p.addDostawa("Dostawa: "  + rs.getString("IloscValue"));
                                     Log.e("debug", "" + rs.getString("IloscValue"));
                                     counter++;
                                 }
@@ -848,13 +986,14 @@ private void addToListOfProducts(Product p, boolean havePartion) {
                     }
                     counter1++;
                     p.setStanMag(i);
+                    Log.e("PRODUKT", "USTAWIONE JEST: "+ p.getCount() + " a na stanie: " + p.getStanMag());
                     publishProgress(counter1);
                 }
                 }catch(SQLException e){
                     e.printStackTrace();
                 }
 
-            return i;
+            return 0;
         }
 
         @Override

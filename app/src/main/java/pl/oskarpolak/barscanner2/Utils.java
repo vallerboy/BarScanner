@@ -32,6 +32,7 @@ import pl.oskarpolak.barscanner2.mysql.MysqlLocalConnector;
 public class Utils {
 
     public static final String DBNAME = "testowa";
+    public  static final int VERSION = 3;
 
     public static String getLastTwoDigistsOfYear() {
         Calendar cal = Calendar.getInstance();
@@ -137,21 +138,15 @@ public class Utils {
         ListView lista = (ListView) dialog.findViewById(R.id.listaPartie);
         lista.setAdapter(new PartiaAdapter(productList, con));
 
-        for(Product p : productList){
-            String[] doc = con.doce.get(p.getPartion()).split(",");
-            for(String s : doc){
-                p.addDoc(s);
-                Log.e("debug", "dodaje nowy doc przypisany do partii" + s );
-            }
-        }
+
 
         lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                con.addProductToList(productList.get(position));
-
-
+                for(String s : productList.get(position).getDoce()){
+                    Log.e("partie", "doce partii dla wybranego produktu: " + s);
+                }
+                showCustomInfoDialogDostawy(con, productList.get(position));
                 dialog.dismiss();
             }
         });
@@ -160,7 +155,31 @@ public class Utils {
         dialog.show();
     }
 
+    public static void showCustomInfoDialogDostawy(final NewDocumentActivity con, final Product p) {
+        final Dialog dialog = new Dialog(con);
+        dialog.setContentView(R.layout.wybierz_partie);
+        dialog.setTitle("Wybierz dostawę");
+        dialog.setCancelable(false);
 
+        // set the custom dialog components - text, image and button
+        ListView lista = (ListView) dialog.findViewById(R.id.listaPartie);
+        lista.setAdapter(new DostawaAdapter(p, con));
+
+
+
+        lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                p.setWybranaDostawa(p.getDoce().get(position));
+                Log.e("debug", "Wybrano dostawe: " + p.getDoce().get(position));
+                con.addProductToList(p);
+                dialog.dismiss();
+            }
+        });
+
+
+        dialog.show();
+    }
 
 
     }

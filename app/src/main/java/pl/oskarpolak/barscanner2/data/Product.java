@@ -1,5 +1,7 @@
 package pl.oskarpolak.barscanner2.data;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +18,9 @@ public class Product {
      private String id;
      private String masa;
 
+
+     private String defStawki;
+
      private int stanMagazynowy;
 
      private int nextListId;
@@ -27,7 +32,7 @@ public class Product {
      private List<String> doce;
      private List<String> dostawy;
 
-    public Product(String name, String id) {
+    public Product(String name, String id, String stawka) {
         this.name = name;
         this.desctription = "";
         // TODO partia
@@ -37,14 +42,37 @@ public class Product {
         this.id = id;
         doce = new ArrayList<String>();
         dostawy  = new ArrayList<String>();
+         defStawki = stawka;
     }
 
+    public String getDefStawki() {
+        return defStawki;
+    }
+
+    public void setDefStawki(String defStawki) {
+        this.defStawki = defStawki;
+    }
 
     public void addDoc(String doc){
-        if(!doce.contains(doc)){
+
             doce.add(doc);
-        }
+
     }
+    String wybranaDostawa;
+
+    public String getWybranaDostawa() {
+        if(wybranaDostawa == null || wybranaDostawa.equals("")){
+            Log.e("debug", "Korzystam z alternatwy przy " + getName());
+
+            return getDoce().get(0);
+        }
+        return wybranaDostawa;
+    }
+
+    public void setWybranaDostawa(String wybranaDostawa) {
+        this.wybranaDostawa = wybranaDostawa;
+    }
+
     public List<String> getDoce(){
         return doce;
     }

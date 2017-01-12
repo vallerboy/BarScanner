@@ -60,17 +60,17 @@ public class InfoAdapter extends BaseAdapter {
 
 
         ViewHolder holder;
-        if (view != null) {
-            holder = (ViewHolder) view.getTag();
-        } else {
+       // if (view != null) {
+        //    holder = (ViewHolder) view.getTag();
+       // } else {
             view = layoutInflater.inflate(R.layout.custom_row_info, parent, false);
             holder = new ViewHolder(view);
-            view.setTag(holder);
+         //   view.setTag(holder);
             TextView  text = holder.textView;
             new AsyncGetZasoby(position, text, holder.dostawy).execute();
-        }
+       // }
 
-       holder.textID.setText((position+1)+".");
+        holder.textID.setText((position+1)+".");
         holder.partia.setText("" + products.get(position).getPartion());
         return view;
     }
@@ -109,33 +109,35 @@ public class InfoAdapter extends BaseAdapter {
            // terz musze puscic petle bo tych docow jest wiecej niz 1
            Log.e("debug", "ma partie");
            List<String> doce = new ArrayList<String>();
-           for(String s : p.getDoce()) {
-               ResultSet rs1 = statement1.executeQuery("SELECT * FROM PozycjeDokHan WHERE ID=" + s);
+
+           String s1 = p.getWybranaDostawa();
+               ResultSet rs1 = statement1.executeQuery("SELECT * FROM PozycjeDokHan WHERE ID=" + s1);
 
                while (rs1.next()) {
                    doce.add(rs1.getString("Dokument"));
                }
-           }
-           int counter = 1;
-           for(String s : doce) {
-               String sql = "SELECT * FROM Zasoby WHERE Towar=" + products.get(pos).getId() + " AND " +
-                       "PartiaDokument=" + s + ";";
 
 
-               ResultSet rs = statement.executeQuery(sql);
-               try {
-                   while (rs.next()) {
-                       i += Long.parseLong(rs.getString("IloscValue"));
-                       p.addDostawa("Dostawa " + counter + ": " + rs.getString("IloscValue"));
-                       Log.e("debug", "" + rs.getString("IloscValue"));
-                       counter ++;
-                   }
+          for(String s : doce) {
+              String sql = "SELECT * FROM Zasoby WHERE Towar=" + products.get(pos).getId() + " AND " +
+                      "PartiaDokument=" + s + ";";
 
 
-               } catch (SQLException e) {
-                   e.printStackTrace();
-               }
-           }
+              ResultSet rs = statement.executeQuery(sql);
+              try {
+                  while (rs.next()) {
+                      i += Integer.valueOf(rs.getString("IloscValue"));
+                      p.setStanMag(Integer.valueOf(rs.getString("IloscValue")));
+                      p.addDostawa("Ilość sztuk w dostawie" + ": " + rs.getString("IloscValue"));
+                      Log.e("debug", "" + rs.getString("IloscValue"));
+
+                  }
+
+
+              } catch (SQLException e) {
+                  e.printStackTrace();
+              }
+          }
        }else {
            Log.e("debug", "nie ma");
            String sql = "SELECT * FROM Zasoby WHERE Towar=" + products.get(pos).getId() + " LIMIT 1";
@@ -165,7 +167,7 @@ public class InfoAdapter extends BaseAdapter {
             products.get(pos).setStanMag(aVoid);
 
             view.setText("" + products.get(pos).getName() + " : " + aVoid + " szt/kg");
-            String dostawy = "Dostawy:\n";
+            String dostawy = "";
             for(String s : products.get(pos).getDostawy()){
                 dostawy += s+"\n";
             }
@@ -275,6 +277,7 @@ public class InfoAdapter extends BaseAdapter {
 
         public ViewHolder(View v) {
             ButterKnife.bind(this, v);
+            partia.setVisibility(View.GONE);
         }
 
 

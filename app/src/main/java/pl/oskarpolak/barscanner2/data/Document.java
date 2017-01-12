@@ -88,6 +88,8 @@ public class Document {
         this.lastNumerPelnyFV = lastNumerPelnyFV;
     }
 
+
+
     private List<Product> products;
 
     public String getFULLIDREZConformed() {
@@ -104,10 +106,16 @@ public class Document {
 
     public String getFULL() {
         String roboczo = "";
-        // 6 zer
+        // 4  zer
         String liczba = this.getLastFactureId();
+        int iloscZer = 4 - liczba.length();
+        for(int i = 0; i < iloscZer; i++){
+            roboczo += "0";
+        }
+        roboczo += liczba;
+        return roboczo;
 
-        return liczba;
+
     }
 
 

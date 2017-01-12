@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TextView
+        android:text="Dostawa: "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="10dp"
+        android:textSize="25sp"
+        android:layout_marginTop="11dp"
+        android:id="@+id/testNameProduct1" />
+
+    <TextView
+        android:text="Ilość: "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/testNameProduct1"
+        android:layout_alignStart="@+id/testNameProduct1"
+        android:layout_marginTop="11dp"
+        android:textSize="25sp"
+        android:id="@+id/textPartia1" />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:id="@+id/separator"
+        android:visibility="visible"
+        android:paddingTop="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_alignBottom="@+id/textPartia1"
+        android:background="@color/black"/>
+
+</RelativeLayout>

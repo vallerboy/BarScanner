@@ -15,13 +15,13 @@ import java.sql.SQLException;
 
 public class MysqlLocalConnector {
 
-    public static final String urlData = "jdbc:mysql://192.168.0.19:3306/bartek?useUnicode=yes&characterEncoding=UTF-8";
-    public static final String loginData = "root";
-    public static final String passwordData = "10135886";
-
-//    public static final String urlData = "jdbc:mysql://5.135.218.27:3306/oskar?useUnicode=yes&characterEncoding=UTF-8";
+//    public static final String urlData = "jdbc:mysql://192.168.0.19:3306/bartek?useUnicode=yes&characterEncoding=UTF-8";
 //    public static final String loginData = "root";
-//    public static final String passwordData = "polako18";
+//    public static final String passwordData = "10135886";
+
+    public static final String urlData = "jdbc:mysql://5.135.218.27:3306/oskar?useUnicode=yes&characterEncoding=UTF-8";
+    public static final String loginData = "root";
+    public static final String passwordData = "polako18";
 
     private static  MysqlLocalConnector state;
     private  static Connection connection;
