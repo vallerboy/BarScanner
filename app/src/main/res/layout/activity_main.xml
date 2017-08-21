@@ -21,15 +21,6 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
-    <Button
-        android:text="Nowy dokument"
-        android:layout_width="200dp"
-        android:layout_height="100dp"
-        android:id="@+id/buttonScan"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="23dp" />
-
     <TextView
         android:text="Uwagi:\n- Nie zapomnij o WiFI!\n-Upewnij się czy na urządzeniu jest odpowiednia godzina"
         android:layout_width="wrap_content"
@@ -48,4 +39,30 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:id="@+id/textView4" />
+
+    <Button
+        android:text="Sprawdź cene"
+        android:layout_width="100dp"
+        android:layout_height="70dp"
+        android:id="@+id/buttonCena"
+        android:layout_above="@+id/textView3"
+        android:layout_alignStart="@+id/textResult" />
+
+    <Button
+        android:text="Resetuj stany"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonReset"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:text="Nowy dokument"
+        android:layout_width="150dp"
+        android:layout_height="100dp"
+        android:id="@+id/buttonScan"
+        android:layout_marginTop="52dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="21dp" />
 </RelativeLayout>

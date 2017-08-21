@@ -3,20 +3,24 @@
     package="pl.oskarpolak.barscanner2">
 
 
-
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"></uses-permission>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"></uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="Bratek"
         android:supportsRtl="true"
+        android:largeHeap="true"
+        android:hardwareAccelerated="true"
         android:theme="@style/AppTheme">
         <activity android:name="pl.oskarpolak.barscanner2.MainActivity">
 
@@ -29,11 +33,19 @@
         </intent-filter></activity>
 
 
-        <activity android:windowSoftInputMode="adjustPan" android:name="pl.oskarpolak.barscanner2.NewDocumentActivity"></activity><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
+
+        <activity android:hardwareAccelerated="true" android:windowSoftInputMode="adjustPan" android:name="pl.oskarpolak.barscanner2.NewDocumentActivity"></activity><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+        <receiver android:name=".WifiBroadcast">
+            <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+            <action android:name="android.net.wifi.NETWORK_STATE_CHANGED_ACTION" />
+            <action android:name="android.net.wifi.STATE_CHANGE" />
+            <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+            <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+        </receiver>
     </application>
 
 </manifest>

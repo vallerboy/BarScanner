@@ -17,6 +17,7 @@
         android:id="@+id/productsList"
         android:divider="#000000"
         android:dividerHeight="2px"
+        android:smoothScrollbar="true"
         android:layout_above="@+id/textWIFI"
         android:layout_alignParentTop="true" />
 

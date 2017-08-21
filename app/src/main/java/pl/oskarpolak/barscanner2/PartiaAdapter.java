@@ -13,7 +13,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import pl.oskarpolak.barscanner2.data.Product;
 import pl.oskarpolak.barscanner2.mysql.MysqlLocalConnector;
@@ -23,21 +26,20 @@ import pl.oskarpolak.barscanner2.mysql.MysqlLocalConnector;
  */
 
 public class PartiaAdapter extends BaseAdapter {
-
-    ArrayList<Product> products;
+    Product product;
     Context context;
     private LayoutInflater layoutInflater;
     private MysqlLocalConnector mysql;
 
-    public PartiaAdapter(List<Product> productList, Context con){
-        products = (ArrayList<Product>) productList;
+    public PartiaAdapter(Product productList, Context con){
+        product =  productList;
         context = con;
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mysql = MysqlLocalConnector.getInstance().getInstance();
+        mysql = MysqlLocalConnector.getInstance(con);
     }
     @Override
     public int getCount() {
-        return products.size();
+        return product.getPartie().size();
     }
 
     @Override
@@ -59,8 +61,8 @@ public class PartiaAdapter extends BaseAdapter {
         TextView  name = (TextView) view.findViewById(R.id.testNameProduct);
         TextView  partia = (TextView) view.findViewById(R.id.textPartia);
 
-        name.setText(products.get(position).getName());
-        partia.setText("Partia: "  + products.get(position).getPartion());
+        name.setText(product.getName());
+        partia.setText("Partia: "  + product.getPartie().get(position).getPartia());
 
         new AsyncGetZasoby(position, partia).execute();
 
@@ -87,55 +89,28 @@ public class PartiaAdapter extends BaseAdapter {
                 statement = mysql.getConnection().createStatement();
                 statement1 = mysql.getConnection().createStatement();
 
-
-
-                if(products.get(pos).isHasPartion()) {
-                    final Product p = products.get(pos);
+                if(product.isHasPartion()) {
+                    final Product p = product;
                     // terz musze puscic petle bo tych docow jest wiecej niz 1
                     Log.e("debug", "ma partie");
-                    List<String> doce = new ArrayList<String>();
-                    for(String s : p.getDoce()) {
-                        ResultSet rs1 = statement1.executeQuery("SELECT * FROM PozycjeDokHan WHERE ID=" + s);
 
-                        while (rs1.next()) {
-                            doce.add(rs1.getString("Dokument"));
-                        }
-                    }
                     int counter = 1;
-                    for(String s : doce) {
-                        String sql = "SELECT * FROM Zasoby WHERE Towar=" + products.get(pos).getId() + " AND " +
-                                "PartiaDokument=" + s + ";";
+                    for (String s : p.getPartie().get(pos).getZasoby()) {
 
+                        String sql = "SELECT * FROM Zasoby WHERE ID = " + s;
 
                         ResultSet rs = statement.executeQuery(sql);
                         try {
                             while (rs.next()) {
                                 i += Long.parseLong(rs.getString("IloscValue"));
-
-                                Log.e("debug", "" + rs.getString("IloscValue"));
-                                counter ++;
                             }
 
 
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
+                        counter++;
                     }
-                }else {
-                    Log.e("debug", "nie ma");
-                    String sql = "SELECT * FROM Zasoby WHERE Towar=" + products.get(pos).getId() + " LIMIT 1";
-
-                    try {
-                        ResultSet rs = statement.executeQuery(sql);
-                        while (rs.next()) {
-                            i += Long.parseLong(rs.getString("IloscValue"));
-                            Log.e("debug", "" + i);
-                        }
-                        // nie ma partii
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -147,7 +122,7 @@ public class PartiaAdapter extends BaseAdapter {
         @Override
         protected void onPostExecute(Integer aVoid) {
 
-            products.get(pos).setStanMag(aVoid);
+            product.setStanMag(aVoid);
             view.setText(view.getText()+"\n" + "Ilosc: " + aVoid + " szt/kg");
 
 

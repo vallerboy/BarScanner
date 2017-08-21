@@ -79,22 +79,11 @@ public class SplashActivity extends AppCompatActivity {
 
         @Override
         protected Integer doInBackground(Void... params) {
-            MysqlLocalConnector.getInstance();
-
-            HttpClient client = new DefaultHttpClient();
-            HttpGet request = new HttpGet("http://techloft.pl/bratek/version.php");
-            // Get the response
-            ResponseHandler<String> responseHandler = new BasicResponseHandler();
-            String response_str = null;
-            try {
-                 response_str = client.execute(request, responseHandler);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            MysqlLocalConnector.getInstance(SplashActivity.this).getConnection();
+            MysqlLocalConnector.getInstance(SplashActivity.this);
 
 
-
-            return Integer.valueOf(response_str);
+            return Integer.valueOf(0);
         }
 
         @Override
@@ -104,29 +93,25 @@ public class SplashActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Integer aVoid) {
-            Log.e("debug", aVoid + "");
-            if(aVoid > Utils.VERSION) {
+
                 createDialog();
-            }else{
-                Intent i = new Intent(SplashActivity.this, MainActivity.class);
-                startActivity(i);
-            }
+
         }
     }
 
     private void createDialog(){
         new AlertDialog.Builder(this)
-                .setTitle("Aktulizacji")
-                .setMessage("Znaleziono nową aktualizacje, pobrać ją?")
-                .setPositiveButton("Tak", new DialogInterface.OnClickListener() {
+                .setTitle("Poczucie humoru")
+                .setMessage("Jak się dziś czujesz?")
+                .setPositiveButton("Super", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        new DownloadTask(SplashActivity.this).execute("http://techloft.pl/bratek/appka.apk");
+                        Intent i = new Intent(SplashActivity.this, MainActivity.class);
+                        startActivity(i);
                     }
                 })
                 .setCancelable(false)
 
-                .setNegativeButton("Nie", new DialogInterface.OnClickListener() {
+                .setNegativeButton("średnio :(", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Intent i = new Intent(SplashActivity.this, MainActivity.class);

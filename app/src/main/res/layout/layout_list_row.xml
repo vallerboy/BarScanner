@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/produktLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -42,6 +43,7 @@
         android:layout_alignStart="@+id/buttonAdd1"
         android:id="@+id/textDescription"
         android:gravity="center"
+        android:textSize="20sp"
         android:layout_alignEnd="@+id/buttonRemove1"
         android:text="Nazwa produktu" />
 

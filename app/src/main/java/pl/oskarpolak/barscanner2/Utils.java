@@ -20,6 +20,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import pl.oskarpolak.barscanner2.data.Partia;
 import pl.oskarpolak.barscanner2.data.Product;
 import pl.oskarpolak.barscanner2.mysql.MysqlLocalConnector;
 
@@ -32,7 +33,7 @@ import pl.oskarpolak.barscanner2.mysql.MysqlLocalConnector;
 public class Utils {
 
     public static final String DBNAME = "testowa";
-    public  static final int VERSION = 3;
+    public  static final int VERSION = 6;
 
     public static String getLastTwoDigistsOfYear() {
         Calendar cal = Calendar.getInstance();
@@ -65,14 +66,26 @@ public class Utils {
         return false;
     }
 
+    public static boolean isWindowOpened = false;
+    public static AlertDialog dialog;
     public static void checkWifiConnectionWithMessage(Context context) {
         ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
         if (!mWifi.isConnected()) {
-            createDialog(context, "Błąd", "Brak połączenia wifi!");
+            MysqlLocalConnector.getInstance(context).getConnection();
+            if(!isWindowOpened) {
+                dialog = createDialogWifi(context, "Błąd", "Brak połączenia wifi!");
+                isWindowOpened = true;
+            }
+        }else{
+            if(isWindowOpened){
+                dialog.dismiss();
+                isWindowOpened = false;
+            }
         }
-        if (!MysqlLocalConnector.getInstance().isDatabaseConnected()) {
+        if (!MysqlLocalConnector.getInstance(context).isDatabaseConnected()) {
+            MysqlLocalConnector.getInstance(context).getConnection();
             createDialog(context, "Błąd", "Brak połączenia z bazą danych!");
         }
     }
@@ -85,6 +98,15 @@ public class Utils {
         return(WifiManager.calculateSignalLevel(wifiInfo.getRssi(), numberOfLevels));
     }
 
+    public static AlertDialog createDialogWifi(Context con, String name, String text){
+        return new AlertDialog.Builder(con)
+                .setTitle(name)
+                .setMessage(text)
+                .setCancelable(false)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+
     public static void createDialog(Context con, String name, String text){
         new AlertDialog.Builder(con)
                 .setTitle(name)
@@ -92,13 +114,14 @@ public class Utils {
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
+                        isWindowOpened = false;
                     }
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
 
-    public static void showCustomInfoDialog(Context con, List<Product> productList) {
+    public static void showCustomInfoDialog(Context con, List<Product> productList, final int scroll) {
         final Dialog dialog = new Dialog(con);
         dialog.setContentView(R.layout.custom_info);
         dialog.setTitle("Stany magazynowe");
@@ -107,14 +130,16 @@ public class Utils {
         final ListView lista = (ListView) dialog.findViewById(R.id.listStanProdukt);
         lista.setAdapter(new InfoAdapter(productList, con));
 
-        Button dialogRefresh = (Button) dialog.findViewById(R.id.buttonRefresh);
-        dialogRefresh.setOnClickListener(new View.OnClickListener() {
+        lista.post(new Runnable() {
             @Override
-            public void onClick(View v) {
-                InfoAdapter infoAdapter = (InfoAdapter) lista.getAdapter();
-                infoAdapter.refresh();
+            public void run() {
+                // Select the last row so it will scroll into view...
+                lista.setSelection(scroll);
             }
         });
+
+
+
 
 
         Button dialogButton = (Button) dialog.findViewById(R.id.buttonExit);
@@ -129,7 +154,7 @@ public class Utils {
         dialog.show();
     }
 
-    public static void showCustomInfoDialogPartie(final NewDocumentActivity con, final List<Product> productList) {
+    public static void showCustomInfoDialogPartie(final NewDocumentActivity con, final Product productList) {
         final Dialog dialog = new Dialog(con);
         dialog.setContentView(R.layout.wybierz_partie);
         dialog.setTitle("Wybierz partię");
@@ -138,15 +163,20 @@ public class Utils {
         ListView lista = (ListView) dialog.findViewById(R.id.listaPartie);
         lista.setAdapter(new PartiaAdapter(productList, con));
 
+        Button button = (Button) dialog.findViewById(R.id.buttonExitPartie);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
 
 
         lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                for(String s : productList.get(position).getDoce()){
-                    Log.e("partie", "doce partii dla wybranego produktu: " + s);
-                }
-                showCustomInfoDialogDostawy(con, productList.get(position));
+                productList.setWybranaPartia(productList.getPartie().get(position));
+                showCustomInfoDialogDostawy(con, productList);
                 dialog.dismiss();
             }
         });
@@ -155,9 +185,11 @@ public class Utils {
         dialog.show();
     }
 
+
+
     public static void showCustomInfoDialogDostawy(final NewDocumentActivity con, final Product p) {
         final Dialog dialog = new Dialog(con);
-        dialog.setContentView(R.layout.wybierz_partie);
+        dialog.setContentView(R.layout.custom_dostawa);
         dialog.setTitle("Wybierz dostawę");
         dialog.setCancelable(false);
 
@@ -165,13 +197,38 @@ public class Utils {
         ListView lista = (ListView) dialog.findViewById(R.id.listaPartie);
         lista.setAdapter(new DostawaAdapter(p, con));
 
+        Button exit = (Button) dialog.findViewById(R.id.buttonExitDostawa);
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(p.isHasPartion()){
+                    showCustomInfoDialogPartie(con, p);
+                    dialog.dismiss();
+                }else {
+                    dialog.dismiss();
+                }
+
+
+
+            }
+        });
 
 
         lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                p.setWybranaDostawa(p.getDoce().get(position));
-                Log.e("debug", "Wybrano dostawe: " + p.getDoce().get(position));
+                if(p.isHasPartion()) {
+                    p.setWybranaDostawa(p.getWybranaPartia().getPozcyje().get(position));
+                    p.setWybranyZasob(p.getWybranaPartia().getZasoby().get(position));
+
+                }else{
+                    p.setWybranyZasob(p.getPartie().get(position).getZasoby().get(0));
+                    p.setWybranaPartia(p.getPartie().get(position));
+                    p.setWybranaDostawa(p.getPartie().get(position).getPozcyje().get(0));
+                    Log.e("nowysystem", "Wybrano dostawe: " + p.getPartie().get(position).getPozcyje().get(0));
+                }
+                //Log.e("debug", "Wybrano dostawe: " + p.getWybranaPartia().getPozcyje().get(position));
                 con.addProductToList(p);
                 dialog.dismiss();
             }

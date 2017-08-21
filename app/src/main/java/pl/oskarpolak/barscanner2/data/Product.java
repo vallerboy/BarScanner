@@ -1,9 +1,17 @@
 package pl.oskarpolak.barscanner2.data;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
+
+
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+
+import pl.oskarpolak.barscanner2.mysql.MysqlLocalConnector;
 
 /**
  * Created by OskarPraca on 2016-11-13.
@@ -31,6 +39,12 @@ public class Product {
 
      private List<String> doce;
      private List<String> dostawy;
+     private Set<String> zasoby;
+     private List<String> docHandlowe;
+
+     private List<Partia> partie;
+     private Partia wybranaPartia;
+     private String wybranyZasob;
 
     public Product(String name, String id, String stawka) {
         this.name = name;
@@ -39,14 +53,86 @@ public class Product {
          stanMag = 0;
         this.count = 0;
         this.masa = masa;
+        this.partion = "";
         this.id = id;
         doce = new ArrayList<String>();
         dostawy  = new ArrayList<String>();
+        zasoby = new LinkedHashSet<>();
          defStawki = stawka;
+        docHandlowe = new ArrayList<String>();
+        partie = new ArrayList<>();
+        roznica = 0;
+
     }
 
+    public String getWybranyZasob() {
+        return wybranyZasob;
+    }
+
+    public void setWybranyZasob(String wybranyZasob) {
+        this.wybranyZasob = wybranyZasob;
+    }
+
+    public void addDocHandlowy(String s){
+        docHandlowe.add(s);
+    }
+    public void addPartia(Partia p){
+        partie.add(p);
+    }
+
+    public Partia getWybranaPartia() {
+        return wybranaPartia;
+    }
+
+    public void setWybranaPartia(Partia wybranaPartia) {
+        this.wybranaPartia = wybranaPartia;
+    }
+
+    public int roznica;
+
+    public int getRoznica() {
+        return roznica;
+    }
+
+    public void setRoznica(int roznica) {
+        this.roznica = roznica;
+    }
+
+    public boolean isPartiaAdded(String partia){
+        for(Partia p : partie){
+            if(p.getPartia().equals(partia)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+    public Partia getPariaByName(String name){
+        for(Partia p: partie) {
+            if (p.getPartia().equals(name)) {
+                return p;
+            }
+        }
+            return null;
+    }
+
+    public List<Partia> getPartie(){
+        return partie;
+    }
+    public List<String> getDoceHandlowe(){
+        return  docHandlowe;
+    }
     public String getDefStawki() {
         return defStawki;
+    }
+
+    public void addZasob(String s) {
+        zasoby.add(s);
+    }
+    public Set<String> getZasoby() {
+        return zasoby;
     }
 
     public void setDefStawki(String defStawki) {
@@ -54,18 +140,15 @@ public class Product {
     }
 
     public void addDoc(String doc){
-
+        Log.e("ZASOBY", "DODAJE DOCA " + doc + " DO PARTII " + getPartion());
+        if(!doce.contains(doc)) {
             doce.add(doc);
+        }
 
     }
     String wybranaDostawa;
 
     public String getWybranaDostawa() {
-        if(wybranaDostawa == null || wybranaDostawa.equals("")){
-            Log.e("debug", "Korzystam z alternatwy przy " + getName());
-
-            return getDoce().get(0);
-        }
         return wybranaDostawa;
     }
 
@@ -164,20 +247,65 @@ public class Product {
         return desctription;
     }
 
-    public void addCount(int howmuch) {
+    public int addCount(int howmuch) {
+        setRoznica(count);
         count += howmuch;
+        return count;
     }
-    public void remCount(int howmuch){
+    public int remCount(int howmuch){
+        setRoznica(count);
         if(count - howmuch > 0) {
             count -= howmuch;
         }else {
             count = 0;
         }
+        return count;
     }
     public int getCount(){
         return count;
     }
     public void setCount(int count){
+        roznica = this.count;
         this.count = count;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Product product = (Product) o;
+
+        if (stanMagazynowy != product.stanMagazynowy) return false;
+        if (hasPartion != product.hasPartion) return false;
+        if (stanMag != product.stanMag) return false;
+        if (name != null ? !name.equals(product.name) : product.name != null) return false;
+        if (partion != null ? !partion.equals(product.partion) : product.partion != null)
+            return false;
+        if (code != null ? !code.equals(product.code) : product.code != null) return false;
+        if (id != null ? !id.equals(product.id) : product.id != null) return false;
+        if (defStawki != null ? !defStawki.equals(product.defStawki) : product.defStawki != null)
+            return false;
+        if (wybranaDostawa != null ? !wybranaDostawa.equals(product.wybranaDostawa) : product.wybranaDostawa != null)
+            return false;
+        return doc != null ? doc.equals(product.doc) : product.doc == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (partion != null ? partion.hashCode() : 0);
+        result = 31 * result + (code != null ? code.hashCode() : 0);
+        result = 31 * result + (id != null ? id.hashCode() : 0);
+        result = 31 * result + (defStawki != null ? defStawki.hashCode() : 0);
+        result = 31 * result + stanMagazynowy;
+        result = 31 * result + (hasPartion ? 1 : 0);
+        result = 31 * result + stanMag;
+        result = 31 * result + (wybranaDostawa != null ? wybranaDostawa.hashCode() : 0);
+        result = 31 * result + (doc != null ? doc.hashCode() : 0);
+        return result;
+    }
+
+
 }
